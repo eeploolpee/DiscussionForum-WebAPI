@@ -1,0 +1,14 @@
+﻿@model DiscussionForum.Post
+
+@{
+    ViewBag.Title = "View | Discussion Forum";
+}
+
+<div class="text-left">
+    <h1 class="display-3">@Model.Title</h1>
+    <hr />
+</div>
+<div class="container">
+    @Html.Raw(@Model.Description)
+</div>
+
