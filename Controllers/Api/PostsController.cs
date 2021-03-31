@@ -12,6 +12,7 @@ using DiscussionForum;
 
 namespace DiscussionForum.Controllers
 {
+    [Authorize]
     public class PostsController : ApiController
     {
         private DiscussionForumEntities db = new DiscussionForumEntities();

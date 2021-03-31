@@ -1,11 +1,11 @@
 ﻿@model DiscussionForum.Post
 
 @{
-    ViewBag.Title = "Create post | Discussion Forum";
+    ViewBag.Title = "Edit post | Discussion Forum";
 }
 
 <div class="text-left">
-    <h1 class="display-3">Create Post</h1>
+    <h1 class="display-3">Edit Post</h1>
     <hr />
 </div>
 
@@ -16,10 +16,12 @@
     <div class="row">
         <div class="col-md-12">
             @Html.ValidationSummary(true, "", new { @class = "text-danger" })
-
+            @Html.HiddenFor(model => model.Id)
+            @Html.HiddenFor(model => model.CreatedBy)
+            @Html.HiddenFor(model => model.CreatedTime)
             <div class="form-group mb-3">
                 @Html.LabelFor(model => model.Title, htmlAttributes: new { @class = "form-label" })
-                @Html.TextBoxFor(model => model.Title, htmlAttributes: new {@placehoder = "user@mail.com", @class = "form-control form-control-lg" })
+                @Html.TextBoxFor(model => model.Title, htmlAttributes: new { @placehoder = "user@mail.com", @class = "form-control form-control-lg" })
                 @Html.ValidationMessageFor(model => model.Title, "", new { @class = "text-danger" })
             </div>
             <div class="form-group mb-3">
@@ -30,7 +32,7 @@
                     CKEDITOR.replace("Description");
                 </script>
             </div>
-            <button type="submit" class="mb-3 btn btn-lg btn-primary">Create</button>
+            <button type="submit" class="mb-3 btn btn-lg btn-primary">Edit</button>
         </div>
     </div>
 }

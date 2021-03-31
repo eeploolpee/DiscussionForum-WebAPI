@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
@@ -36,7 +37,6 @@ namespace DiscussionForum.Controllers
                 return RedirectToAction("login", "users");
             }
             return View();
-
         }
 
         [HttpPost, ValidateInput(false)]
@@ -51,7 +51,15 @@ namespace DiscussionForum.Controllers
                 {
                     if (response.IsSuccessStatusCode)
                     {
-                        return RedirectToAction("index", "home");
+                        var json = response.Content.ReadAsStringAsync().Result;
+                        JObject jObject = JObject.Parse(json);
+                        post.Id = int.Parse((string)jObject["Id"]);
+                        return RedirectToAction("View", "Post", new { id = post.Id });
+                    }
+                    else
+                    {
+                        var json = response.Content.ReadAsStringAsync().Result;
+                        ModelState.AddModelError(String.Empty, json);
                     }
                 }
             }
@@ -65,17 +73,25 @@ namespace DiscussionForum.Controllers
         [HttpGet]
         public async Task<ActionResult> Index()
         {
+            if (Session["token"] == null)
+            {
+                return RedirectToAction("login", "users");
+            }
             IList<Post> postData = null;
             try
             {
+                httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", Session["token"].ToString());
                 using (var response = await httpClient.GetAsync("api/Posts"))
                 {
                     if (response.IsSuccessStatusCode)
                     {
                         postData = response.Content.ReadAsAsync<IList<Post>>().Result;
+                        postData = postData.Where(post => post.CreatedBy == Session["username"].ToString()).Select(post => post).ToList();
                     }
                     else
                     {
+                        var json = response.Content.ReadAsStringAsync().Result;
+                        ModelState.AddModelError(String.Empty, json);
                         ModelState.AddModelError(String.Empty, "Try again after some time.");
                     }
                 }
@@ -102,6 +118,110 @@ namespace DiscussionForum.Controllers
                     else
                     {
                         ModelState.AddModelError(String.Empty, "Post not found");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine(ex.Message);
+            }
+            return View(post);
+        }
+
+        [HttpGet]
+        public async Task<ActionResult> Edit(int id)
+        {
+            if (Session["token"] == null)
+            {
+                return RedirectToAction("login", "users");
+            }
+            Post post = null;
+            try
+            {
+                using (var response = await httpClient.GetAsync("api/Posts/" + id.ToString()))
+                {
+                    if (response.IsSuccessStatusCode)
+                    {
+                        post = response.Content.ReadAsAsync<Post>().Result;
+                    }
+                    else
+                    {
+                        ModelState.AddModelError(String.Empty, "Post not found");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine(ex.Message);
+            }
+            return View(post);
+        }
+
+        [HttpPost, ValidateInput(false)]
+        public async Task<ActionResult> Edit(Post post)
+        {
+            try
+            {
+                httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", Session["token"].ToString());
+                using (HttpResponseMessage response = await httpClient.PutAsJsonAsync<Post>("api/Posts/" + post.Id.ToString(), post))
+                {
+                    if (response.IsSuccessStatusCode)
+                    {
+                        return RedirectToAction("View", "Post", new { id = post.Id });
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine(ex.Message);
+            }
+            return View(post);
+        }
+
+        [HttpGet]
+        public async Task<ActionResult> Delete(int id)
+        {
+            Post post = null;
+            try
+            {
+                using (var response = await httpClient.GetAsync("api/Posts/" + id.ToString()))
+                {
+                    if (response.IsSuccessStatusCode)
+                    {
+                        post = response.Content.ReadAsAsync<Post>().Result;
+                    }
+                    else
+                    {
+                        var json = response.Content.ReadAsStringAsync().Result;
+                        ModelState.AddModelError(String.Empty, json);
+                        ModelState.AddModelError(String.Empty, "Post not found");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine(ex.Message);
+            }
+            return View(post);
+            
+        }
+
+        [HttpPost]
+        public async Task<ActionResult> Delete(Post post)
+        {
+            try
+            {
+                httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", Session["token"].ToString());
+                using (HttpResponseMessage response = await httpClient.DeleteAsync("api/Posts/" + post.Id.ToString()))
+                {
+                    if (response.IsSuccessStatusCode)
+                    {
+                        return RedirectToAction("Index", "Post");
+                    }
+                    else
+                    {
+                        var json = response.Content.ReadAsStringAsync().Result;
+                        ModelState.AddModelError(String.Empty, json);
                     }
                 }
             }
