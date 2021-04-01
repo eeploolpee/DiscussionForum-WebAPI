@@ -3,11 +3,20 @@
     int count = 0;
 }
 <div class="jumbotron">
-    <h1>ASP.NET</h1>
-    <p class="lead">
-        Welcome @Session["username"]
-    </p>
-    <p><a href="https://asp.net" class="btn btn-primary btn-lg">Hello </a></p>
+    <h1>Discussion Forum</h1>
+
+    @if (Session["token"] == null)
+    {
+        <p><a href="/users/login" class="btn btn-primary btn-lg">Login </a>&nbsp;<a href="/users/register" class="btn btn-primary btn-lg">Register </a></p>
+    }
+    else
+    {
+        <p class="lead">
+            Welcome @Session["username"]
+        </p>
+        <p><a href="/post/create" class="btn btn-primary btn-lg">Create post </a>&nbsp; <a href="/post/index" class="btn btn-primary btn-lg">My posts </a></p>
+    }
+
 </div>
 
 <table class="table">

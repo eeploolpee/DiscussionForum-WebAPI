@@ -95,6 +95,7 @@ namespace DiscussionForum.Controllers
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine(ex.Message);
+                ModelState.AddModelError(String.Empty, "Post not found");
             }
             return View(new PostViewModel { post = post, postComment = new Comment()});
         }
@@ -235,8 +236,28 @@ namespace DiscussionForum.Controllers
         [HttpPost]
         public async Task<ActionResult> Delete(Post post)
         {
+            if (Session["token"] == null)
+            {
+                return RedirectToAction("login", "users");
+            }
             try
             {
+                using (var response = await httpClient.GetAsync("api/Posts/" + post.Id.ToString()))
+                {
+                    if (response.IsSuccessStatusCode)
+                    {
+                        Post newPost = response.Content.ReadAsAsync<Post>().Result;
+                        foreach(var comment in newPost.Comments)
+                        {
+                            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", Session["token"].ToString());
+                            var res = await httpClient.DeleteAsync("api/Comments/" + comment.Id.ToString());
+                        }
+                    }
+                    else
+                    {
+                        ModelState.AddModelError(String.Empty, "Post not found");
+                    }
+                }
                 httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", Session["token"].ToString());
                 using (HttpResponseMessage response = await httpClient.DeleteAsync("api/Posts/" + post.Id.ToString()))
                 {

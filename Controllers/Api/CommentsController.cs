@@ -12,17 +12,20 @@ using DiscussionForum;
 
 namespace DiscussionForum.Controllers.Api
 {
+    [Authorize]
     public class CommentsController : ApiController
     {
         private DiscussionForumEntities db = new DiscussionForumEntities();
 
         // GET: api/Comments
+        [AllowAnonymous]
         public IQueryable<Comment> GetComments()
         {
             return db.Comments;
         }
 
         // GET: api/Comments/5
+        [AllowAnonymous]
         [ResponseType(typeof(Comment))]
         public IHttpActionResult GetComment(int id)
         {

@@ -76,6 +76,8 @@
 <div class="jumbotron">
     <div class="text-left">
         <h1>@Model.post.Title </h1>
+        <h5 class="card-title"> By @Model.post.CreatedBy</h5>
+        <h6 class="card-subtitle mb-2 text-muted">@Model.post.CreatedTime</h6>
         <hr />
     </div>
     <div class="container">
@@ -90,7 +92,6 @@
     Model.postComment.ReplyTo = null;
     <div class="row">
         <div class="col-md-12">
-            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
             @Html.HiddenFor(model => model.post.Id)
             <div class="form-group mb-3">
                 <label for="Description" class="col-form-label">Enter your comment below</label>
