@@ -42,7 +42,6 @@ namespace DiscussionForum.Controllers
             postViewModel.postComment.CreatedTime = DateTime.Now;
             postViewModel.postComment.CreatedBy = Session["username"].ToString();
             postViewModel.postComment.PostId = postViewModel.post.Id;
-            postViewModel.postComment.ReplyTo = null;
             try
             {
                 httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", Session["token"].ToString());
