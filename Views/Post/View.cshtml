@@ -1,4 +1,4 @@
-﻿@model DiscussionForum.Post
+﻿@model DiscussionForum.Models.PostViewModel
 
 @{
     ViewBag.Title = "View | Discussion Forum";
@@ -6,11 +6,57 @@
 
 @Html.ValidationSummary(true, "", new { @class = "text-danger" })
 
-<div class="text-left">
-    <h1 class="display-3">@Model.Title </h1>
-    <hr />
+<div class="jumbotron">
+    <div class="text-left">
+        <h1>@Model.post.Title </h1>
+        <hr />
+    </div>
+    <div class="container">
+        @Html.Raw(@Model.post.Description)
+    </div>
 </div>
-<div class="container">
-    @Html.Raw(@Model.Description)
-</div>
+<hr />
 
+@using (Html.BeginForm("Create", "Comment", FormMethod.Post))
+{
+    @Html.AntiForgeryToken()
+
+    <div class="row">
+        <div class="col-md-12">
+            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+            @Html.HiddenFor(model => model.post.Id)
+            <div class="form-group mb-3">
+                @Html.LabelFor(model => model.postComment.Comment1, htmlAttributes: new { @class = "form-label" })
+                @Html.TextAreaFor(model => model.postComment.Comment1, htmlAttributes: new { @id = "Description", @placehoder = "USer@#123", @class = "form-control form-control-lg" })
+                @Html.ValidationMessageFor(model => model.postComment.Comment1, "", new { @class = "text-danger" })
+                <script>
+                    CKEDITOR.replace("Description");
+                </script>
+            </div>
+            <button type="submit" class="mb-3 btn btn-lg btn-primary">Post</button>
+        </div>
+    </div>
+}
+
+<div class="jumbotron">
+    <div class="text-left">
+        <h1>Comments </h1>
+        <hr />
+    </div>
+    <div class="container">
+        
+        @foreach (var comment in Model.post.Comments)
+        {
+        <div class="container">
+            <div class="card" style="margin:20px;">
+                <div class="card-body mt-3">
+                    <h5 class="card-title">@comment.CreatedBy</h5>
+                    <h6 class="card-subtitle mb-2 text-muted">@comment.CreatedTime</h6>
+                    <p class="card-text">@Html.Raw(comment.Comment1)</p>
+                    <a href="#" class="card-link">Reply</a>
+                </div>
+            </div>
+        </div>
+        }
+    </div>
+</div>

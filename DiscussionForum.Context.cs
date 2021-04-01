@@ -18,6 +18,7 @@ namespace DiscussionForum
         public DiscussionForumEntities()
             : base("name=DiscussionForumEntities")
         {
+            //this.Configuration.LazyLoadingEnabled = false;
         }
     
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
@@ -25,7 +26,7 @@ namespace DiscussionForum
             throw new UnintentionalCodeFirstException();
         }
     
+        public virtual DbSet<Comment> Comments { get; set; }
         public virtual DbSet<Post> Posts { get; set; }
-        public virtual DbSet<AspNetUser> AspNetUsers { get; set; }
     }
 }

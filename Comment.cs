@@ -12,21 +12,15 @@ namespace DiscussionForum
     using System;
     using System.Collections.Generic;
     
-    public partial class Post
+    public partial class Comment
     {
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
-        public Post()
-        {
-            this.Comments = new HashSet<Comment>();
-        }
-    
         public int Id { get; set; }
-        public string Title { get; set; }
-        public string Description { get; set; }
+        public string Comment1 { get; set; }
         public System.DateTime CreatedTime { get; set; }
         public string CreatedBy { get; set; }
+        public Nullable<int> ReplyTo { get; set; }
+        public int PostId { get; set; }
     
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<Comment> Comments { get; set; }
+        public virtual Post Post { get; set; }
     }
 }

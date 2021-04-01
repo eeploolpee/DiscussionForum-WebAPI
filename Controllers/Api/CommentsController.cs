@@ -12,44 +12,44 @@ using DiscussionForum;
 
 namespace DiscussionForum.Controllers.Api
 {
-    public class PostsController : ApiController
+    public class CommentsController : ApiController
     {
         private DiscussionForumEntities db = new DiscussionForumEntities();
 
-        // GET: api/Posts
-        public IQueryable<Post> GetPosts()
+        // GET: api/Comments
+        public IQueryable<Comment> GetComments()
         {
-            return db.Posts;
+            return db.Comments;
         }
 
-        // GET: api/Posts/5
-        [ResponseType(typeof(Post))]
-        public IHttpActionResult GetPost(int id)
+        // GET: api/Comments/5
+        [ResponseType(typeof(Comment))]
+        public IHttpActionResult GetComment(int id)
         {
-            Post post = db.Posts.Find(id);
-            if (post == null)
+            Comment comment = db.Comments.Find(id);
+            if (comment == null)
             {
                 return NotFound();
             }
 
-            return Ok(post);
+            return Ok(comment);
         }
 
-        // PUT: api/Posts/5
+        // PUT: api/Comments/5
         [ResponseType(typeof(void))]
-        public IHttpActionResult PutPost(int id, Post post)
+        public IHttpActionResult PutComment(int id, Comment comment)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            if (id != post.Id)
+            if (id != comment.Id)
             {
                 return BadRequest();
             }
 
-            db.Entry(post).State = EntityState.Modified;
+            db.Entry(comment).State = EntityState.Modified;
 
             try
             {
@@ -57,7 +57,7 @@ namespace DiscussionForum.Controllers.Api
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!PostExists(id))
+                if (!CommentExists(id))
                 {
                     return NotFound();
                 }
@@ -70,35 +70,35 @@ namespace DiscussionForum.Controllers.Api
             return StatusCode(HttpStatusCode.NoContent);
         }
 
-        // POST: api/Posts
-        [ResponseType(typeof(Post))]
-        public IHttpActionResult PostPost(Post post)
+        // POST: api/Comments
+        [ResponseType(typeof(Comment))]
+        public IHttpActionResult PostComment(Comment comment)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            db.Posts.Add(post);
+            db.Comments.Add(comment);
             db.SaveChanges();
 
-            return CreatedAtRoute("DefaultApi", new { id = post.Id }, post);
+            return CreatedAtRoute("DefaultApi", new { id = comment.Id }, comment);
         }
 
-        // DELETE: api/Posts/5
-        [ResponseType(typeof(Post))]
-        public IHttpActionResult DeletePost(int id)
+        // DELETE: api/Comments/5
+        [ResponseType(typeof(Comment))]
+        public IHttpActionResult DeleteComment(int id)
         {
-            Post post = db.Posts.Find(id);
-            if (post == null)
+            Comment comment = db.Comments.Find(id);
+            if (comment == null)
             {
                 return NotFound();
             }
 
-            db.Posts.Remove(post);
+            db.Comments.Remove(comment);
             db.SaveChanges();
 
-            return Ok(post);
+            return Ok(comment);
         }
 
         protected override void Dispose(bool disposing)
@@ -110,9 +110,9 @@ namespace DiscussionForum.Controllers.Api
             base.Dispose(disposing);
         }
 
-        private bool PostExists(int id)
+        private bool CommentExists(int id)
         {
-            return db.Posts.Count(e => e.Id == id) > 0;
+            return db.Comments.Count(e => e.Id == id) > 0;
         }
     }
 }

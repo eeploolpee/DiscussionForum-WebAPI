@@ -3,7 +3,6 @@
 @{
     ViewBag.Title = "Delete | Discussion Forum";
 }
-
 @using (Html.BeginForm())
 {
     @Html.AntiForgeryToken()
@@ -14,18 +13,22 @@
             @Html.HiddenFor(model => model.Id)
             <div class="text-left">
                 <h1 class="display-4">Are you sure to delete below post?</h1>
-                <hr />
             </div>
-            <button type="submit" class="mb-3 btn btn-lg btn-danger">Delete</button> |
+            <br/>
+            <button type="submit" class="mb-3 btn btn-lg btn-danger">Yes, Delete it</button> |
             @Html.ActionLink("Back to My posts", "Index", "Post", null, null)
+
         </div>
     </div>
 }
 
-<div class="text-left">
-    <h1 class="display-3">@Model.Title </h1>
-    <hr />
-</div>
-<div class="container">
-    @Html.Raw(@Model.Description)
+<hr/>
+<div class="jumbotron">
+    <div class="text-left">
+        <h1>@Model.Title </h1>
+        <hr />
+    </div>
+    <div class="container">
+        @Html.Raw(@Model.Description)
+    </div>
 </div>

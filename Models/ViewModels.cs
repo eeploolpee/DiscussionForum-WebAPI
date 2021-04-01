@@ -18,4 +18,11 @@ namespace DiscussionForum.Models
         [Display(Name = "Password")]
         public string Password { get; set; }
     }
+
+    public class PostViewModel
+    {
+        //public IList<Comment> comments;
+        public Comment postComment { get; set; }
+        public Post post { get; set; }
+    }
 }

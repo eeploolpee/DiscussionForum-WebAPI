@@ -1,7 +1,9 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using DiscussionForum.Models;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Dynamic;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -30,47 +32,6 @@ namespace DiscussionForum.Controllers
         }
 
         [HttpGet]
-        public ActionResult Create()
-        {
-            if(Session["token"] == null)
-            {
-                return RedirectToAction("login", "users");
-            }
-            return View();
-        }
-
-        [HttpPost, ValidateInput(false)]
-        public async Task<ActionResult> Create(Post post)
-        {
-            post.CreatedTime = DateTime.Now;
-            post.CreatedBy = Session["username"].ToString();
-            try
-            {
-                httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", Session["token"].ToString());
-                using (HttpResponseMessage response = await httpClient.PostAsJsonAsync<Post>("api/Posts", post))
-                {
-                    if (response.IsSuccessStatusCode)
-                    {
-                        var json = response.Content.ReadAsStringAsync().Result;
-                        JObject jObject = JObject.Parse(json);
-                        post.Id = int.Parse((string)jObject["Id"]);
-                        return RedirectToAction("View", "Post", new { id = post.Id });
-                    }
-                    else
-                    {
-                        var json = response.Content.ReadAsStringAsync().Result;
-                        ModelState.AddModelError(String.Empty, json);
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine(ex.Message);
-            }
-            return View(post);
-        }
-
-        [HttpGet]
         public async Task<ActionResult> Index()
         {
             if (Session["token"] == null)
@@ -80,7 +41,6 @@ namespace DiscussionForum.Controllers
             IList<Post> postData = null;
             try
             {
-                httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", Session["token"].ToString());
                 using (var response = await httpClient.GetAsync("api/Posts"))
                 {
                     if (response.IsSuccessStatusCode)
@@ -106,7 +66,7 @@ namespace DiscussionForum.Controllers
         [HttpGet]
         public async Task<ActionResult> View(int id)
         {
-            Post post = null;
+            Post post = new Post();
             try
             {
                 using (var response = await httpClient.GetAsync("api/Posts/" + id.ToString()))
@@ -118,6 +78,62 @@ namespace DiscussionForum.Controllers
                     else
                     {
                         ModelState.AddModelError(String.Empty, "Post not found");
+                    }
+                }
+/*                using (var response = await httpClient.GetAsync("api/Comments"))
+                {
+                    if (response.IsSuccessStatusCode)
+                    {
+                        comments = response.Content.ReadAsAsync<IList<Comment>>().Result;
+                    }
+                    else
+                    {
+                        ModelState.AddModelError(String.Empty, "Post not found");
+                    }
+                }*/
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine(ex.Message);
+            }
+            return View(new PostViewModel { post = post, postComment = new Comment()});
+        }
+
+        [HttpGet]
+        public ActionResult Create()
+        {
+            if (Session["token"] == null)
+            {
+                return RedirectToAction("login", "users");
+            }
+            return View();
+        }
+
+        [HttpPost, ValidateInput(false)]
+        public async Task<ActionResult> Create(Post post)
+        {
+            if (Session["token"] == null)
+            {
+                return RedirectToAction("login", "users");
+            }
+            post.CreatedTime = DateTime.Now;
+            post.CreatedBy = Session["username"].ToString();
+            try
+            {
+                httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", Session["token"].ToString());
+                using (HttpResponseMessage response = await httpClient.PostAsJsonAsync<Post>("api/Posts", post))
+                {
+                    if (response.IsSuccessStatusCode)
+                    {
+                        var json = response.Content.ReadAsStringAsync().Result;
+                        JObject jObject = JObject.Parse(json);
+                        post.Id = int.Parse((string)jObject["Id"]);
+                        return RedirectToAction("View", "Post", new { id = post.Id });
+                    }
+                    else
+                    {
+                        var json = response.Content.ReadAsStringAsync().Result;
+                        ModelState.AddModelError(String.Empty, json);
                     }
                 }
             }
@@ -160,6 +176,10 @@ namespace DiscussionForum.Controllers
         [HttpPost, ValidateInput(false)]
         public async Task<ActionResult> Edit(Post post)
         {
+            if (Session["token"] == null)
+            {
+                return RedirectToAction("login", "users");
+            }
             try
             {
                 httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", Session["token"].ToString());
@@ -181,9 +201,14 @@ namespace DiscussionForum.Controllers
         [HttpGet]
         public async Task<ActionResult> Delete(int id)
         {
+            if (Session["token"] == null)
+            {
+                return RedirectToAction("login", "users");
+            }
             Post post = null;
             try
             {
+                httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", Session["token"].ToString());
                 using (var response = await httpClient.GetAsync("api/Posts/" + id.ToString()))
                 {
                     if (response.IsSuccessStatusCode)
@@ -192,6 +217,7 @@ namespace DiscussionForum.Controllers
                     }
                     else
                     {
+                        post = new Post();
                         var json = response.Content.ReadAsStringAsync().Result;
                         ModelState.AddModelError(String.Empty, json);
                         ModelState.AddModelError(String.Empty, "Post not found");
