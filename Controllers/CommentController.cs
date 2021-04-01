@@ -62,6 +62,7 @@ namespace DiscussionForum.Controllers
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine(ex.Message);
+                ModelState.AddModelError(String.Empty, "Try again after some time.");
             }
             return RedirectToAction("View", "Post", new { postViewModel = postViewModel });
         }
